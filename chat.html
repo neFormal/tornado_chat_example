@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script language="javascript">
+var hostname = window.location.hostname;
+var ws = new WebSocket("ws://" + hostname + ":{{ port }}/wschat/{{ current_user.login }}/{{ token }}");
+ws.onopen = function() {
+    ws.send("joined chat");
+};
+ws.onmessage = function(event) {
+    console.log(event);
+    document.getElementById('chat').value += event.data + '\n';
+};
+ws.onclose = function(event) {
+  if (event.wasClean) {
+    console.log('ws connection is closed');
+  } else {
+    alert('no carrier: ' + event.reason);
+  }
+  document.location.href = '/';
+};
+ws.onerror = function(error) {
+  alert("error " + error.message);
+  document.location.href = '/';
+};
+function send() {
+    ws.send(document.getElementById('input').value);
+    document.getElementById('input').value = '';
+}
+</script>
+</head>
+<body>
+<h1>chat</h1>
+<h2>{{ current_user.login }}</h2>
+
+<form>
+<textarea id="chat" cols="80" rows="10"></textarea><br/>
+<input id="input" type="text" size="70"/>
+<input type="button" onclick="send(); return false;" value="send"/>
+</form>
+
+</body>
+</html>
